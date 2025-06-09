@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Menghitung Koefisien Korelasi dan Determinasi, Persamaan Regresi serta Grafiknya</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@700&family=Poppins&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --color-bg: #ffffff;
+      --color-primary: #2563eb;
+      --color-text-primary: #111827;
+      --color-text-secondary: #6b7280;
+      --color-card-bg: #f9fafb;
+      --color-shadow: rgba(30, 41, 59, 0.1);
+      --radius: 0.75rem;
+      --font-heading: 'Inter', sans-serif;
+      --font-body: 'Poppins', sans-serif;
+      --gap: 1.5rem;
+    }
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      font-family: var(--font-body);
+      background-color: var(--color-bg);
+      color: var(--color-text-primary);
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 3rem 1rem 5rem;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    .container {
+      max-width: 1200px;
+      width: 100%;
+    }
+    h1 {
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: 3rem;
+      margin-bottom: 0.25rem;
+      color: var(--color-primary);
+      user-select: none;
+      line-height: 1.1;
+    }
+    p.subtitle {
+      color: var(--color-text-secondary);
+      font-weight: 500;
+      font-size: 1.125rem;
+      margin-bottom: 2.5rem;
+      user-select: none;
+      max-width: 680px;
+    }
+    .input-section {
+      background: var(--color-card-bg);
+      border-radius: var(--radius);
+      padding: 2rem 2.5rem;
+      box-shadow: 0 6px 10px var(--color-shadow);
+      margin-bottom: 3rem;
+      transition: box-shadow 0.25s ease;
+      user-select: none;
+    }
+    .input-section:hover,
+    .input-section:focus-within {
+      box-shadow: 0 10px 25px var(--color-shadow);
+    }
+    label {
+      display: block;
+      font-weight: 700;
+      font-size: 1.15rem;
+      margin-bottom: 0.6rem;
+      color: var(--color-text-primary);
+      user-select: none;
+    }
+    textarea {
+      width: 100%;
+      min-height: 140px;
+      font-family: monospace;
+      font-size: 1rem;
+      padding: 1rem 1.2rem;
+      border-radius: var(--radius);
+      border: 1.75px solid #d1d5db;
+      resize: vertical;
+      transition: border-color 0.3s ease;
+      line-height: 1.3;
+    }
+    textarea:focus {
+      outline: none;
+      border-color: var(--color-primary);
+      box-shadow: 0 0 8px var(--color-primary);
+    }
+    small {
+      display: block;
+      margin-top: 0.4rem;
+      color: var(--color-text-secondary);
+      user-select: none;
+      white-space: pre-line;
+      font-size: 0.9rem;
+    }
+    button {
+      margin-top: 1.6rem;
+      background: var(--color-primary);
+      color: white;
+      border: none;
+      padding: 0.85rem 2.25rem;
+      border-radius: var(--radius);
+      font-weight: 700;
+      font-size: 1.15rem;
+      cursor: pointer;
+      user-select: none;
+      transition: background-color 0.3s ease, transform 0.3s ease;
+      box-shadow: 0 4px 10px rgba(37, 99, 235, 0.4);
+    }
+    button:hover,
+    button:focus {
+      background: #1d4ed8;
+      transform: scale(1.05);
+      outline: none;
+      box-shadow: 0 6px 18px rgba(37, 99, 235, 0.6);
+    }
+    button:active {
+      background: #1e40af;
+    }
+    .results-section {
+      margin-bottom: 3rem;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      border-radius: var(--radius);
+      box-shadow: 0 8px 15px var(--color-shadow);
+      overflow: hidden;
+      user-select: none;
+      background: white;
+    }
+    thead {
+      background: var(--color-primary);
+      color: white;
+    }
+    th,
+    td {
+      text-align: center;
+      padding: 0.85rem 1rem;
+      border-bottom: 1px solid #e5e7eb;
+      font-feature-settings: "liga" off;
+      font-weight: 500;
+      font-size: 1rem;
+    }
+    tbody tr:nth-child(odd) {
+      background: #fafafa;
+    }
+    caption {
+      caption-side: top;
+      font-weight: 700;
+      font-size: 1.5rem;
+      color: var(--color-text-primary);
+      padding: 1.25rem 0 0.75rem;
+      user-select: none;
+    }
+    tfoot tr {
+      background: #e0e7ff;
+      font-weight: 700;
+      font-size: 1rem;
+      user-select: none;
+    }
+    tfoot td {
+      padding: 0.9rem 1rem;
+      border-top: 2px solid var(--color-primary);
+      color: var(--color-primary);
+    }
+    .summary {
+      margin-top: 2rem;
+      background: var(--color-card-bg);
+      border-radius: var(--radius);
+      padding: 2rem;
+      box-shadow: 0 6px 20px var(--color-shadow);
+      font-family: var(--font-body);
+      font-size: 1.15rem;
+      color: var(--color-text-primary);
+      display: flex;
+      gap: 4rem;
+      flex-wrap: wrap;
+      user-select: none;
+      justify-content: space-between;
+    }
+    .summary-section {
+      flex: 1 1 300px;
+      min-width: 260px;
+    }
+    .summary-section h3 {
+      color: var(--color-primary);
+      margin-bottom: 1rem;
+      font-weight: 700;
+      font-size: 1.3rem;
+      user-select: none;
+    }
+    .summary-item {
+      margin-bottom: 0.65rem;
+      font-weight: 600;
+      user-select: text;
+    }
+    .result-block {
+      margin-top: 3rem;
+      font-weight: 700;
+      font-size: 1.2rem;
+      user-select: none;
+      max-width: 100%;
+    }
+    .result-block strong {
+      display: inline-block;
+      width: 230px;
+      font-weight: 700;
+      color: var(--color-primary);
+    }
+    canvas {
+      margin-top: 2rem;
+      width: 100% !important;
+      max-height: 400px !important;
+      background: var(--color-card-bg);
+      border-radius: var(--radius);
+      box-shadow: 0 8px 25px var(--color-shadow);
+      user-select: none;
+    }
+    #download-chart {
+      margin-top: 1rem;
+      background: var(--color-primary);
+      color: white;
+      border: none;
+      padding: 0.8rem 2rem;
+      border-radius: var(--radius);
+      font-weight: 700;
+      font-size: 1.1rem;
+      cursor: pointer;
+      user-select: none;
+      transition: background-color 0.3s ease, transform 0.3s ease;
+      box-shadow: 0 5px 15px rgba(37, 99, 235, 0.5);
+      display: inline-block;
+    }
+    #download-chart:hover,
+    #download-chart:focus {
+      background: #1e40af;
+      outline: none;
+      transform: scale(1.05);
+      box-shadow: 0 8px 20px rgba(37, 99, 235, 0.7);
+    }
+    #download-chart:active {
+      background: #1c3aa9;
+    }
+    @media (max-width: 900px) {
+      .summary {
+        flex-direction: column;
+        gap: 2rem;
+      }
+      .summary-section {
+        flex: none;
+        width: 100%;
+      }
+      .result-block {
+        font-size: 1rem;
+      }
+    }
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="container" role="main" aria-label="Perhitungan Statistik dan Grafik">
+    <h1>Menghitung Koefisien Korelasi dan Determinasi, Persamaan Regresi serta Grafiknya</h1>
+    <p class="subtitle">
+      Masukkan data pasangan nilai x dan y, setiap pasangan pada baris baru, pisahkan dengan <code>,</code> atau spasi.<br />
+      Gunakan tanda koma (<code>,</code>) sebagai pemisah desimal juga diperbolehkan, misalnya <code>3,5</code> sama dengan <code>3.5</code>.
+    </p>
+    <section class="input-section" aria-labelledby="input-label">
+      <label id="input-label" for="data-input">Input Data (x, y):</label>
+      <textarea id="data-input" aria-describedby="input-help" placeholder="Contoh:&#10;1, 2&#10;2  3&#10;3,5 7,1"></textarea>
+
+      <button id="calculate-btn" type="button">Hitung</button>
+    </section>
+
+    <section class="results-section" aria-live="polite" aria-atomic="true" aria-relevant="additions removals" tabindex="0">
+      <div id="table-container" style="overflow-x:auto;" hidden>
+        <table id="data-table" summary="Tabel data yang berisi x, y, xx, yy, xy">
+          <caption>Data dan Perhitungan</caption>
+          <thead>
+            <tr>
+              <th>x</th>
+              <th>y</th>
+              <th>xx (x²)</th>
+              <th>yy (y²)</th>
+              <th>xy</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+          <tfoot>
+            <tr>
+              <td>Jumlah</td>
+              <td id="sum-tfoot-y"></td>
+              <td id="sum-tfoot-xx"></td>
+              <td id="sum-tfoot-yy"></td>
+              <td id="sum-tfoot-xy"></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      <div id="summary-container" class="summary" hidden>
+        <div class="summary-section" aria-label="Nilai Sigma dan jumlah data">
+          <h3>Nilai Σ dan Jumlah Data</h3>
+          <div class="summary-item"><strong>Σx:</strong> <span id="sum-x"></span></div>
+          <div class="summary-item"><strong>Σy:</strong> <span id="sum-y"></span></div>
+          <div class="summary-item"><strong>Σxx:</strong> <span id="sum-xx"></span></div>
+          <div class="summary-item"><strong>Σxy:</strong> <span id="sum-xy"></span></div>
+          <div class="summary-item"><strong>Σyy:</strong> <span id="sum-yy"></span></div>
+          <div class="summary-item"><strong>Jumlah data (n):</strong> <span id="count-n"></span></div>
+        </div>
+        <div class="summary-section" aria-label="Nilai SS">
+          <h3>Nilai SS</h3>
+          <div class="summary-item"><strong>SSxx:</strong> <span id="ssxx"></span></div>
+          <div class="summary-item"><strong>SSxy:</strong> <span id="ssxy"></span></div>
+          <div class="summary-item"><strong>SSyy:</strong> <span id="ssyy"></span></div>
+        </div>
+        <div class="summary-section" aria-label="Hasil perhitungan">
+          <h3>Sehingga didapatkan hasil:</h3>
+          <div class="summary-item"><strong>Koefisien Korelasi (r):</strong> <span id="coef-r"></span></div>
+          <div class="summary-item"><strong>Koefisien Determinasi (r²):</strong> <span id="coef-r2"></span></div>
+          <div class="summary-item"><strong>Persamaan Regresi:</strong> <span id="regression-equation"></span></div>
+        </div>
+      </div>
+
+      <div id="chart-container" hidden>
+        <h3>Berikut Gambar Grafiknya:</h3>
+        <canvas id="scatter-chart" aria-label="Grafik data dan garis regresi" role="img"></canvas>
+        <button id="download-chart">Unduh Grafik</button>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    (function () {
+      const textarea = document.getElementById('data-input');
+      const btn = document.getElementById('calculate-btn');
+      const tableContainer = document.getElementById('table-container');
+      const tbody = document.querySelector('#data-table tbody');
+      const sumTfootY = document.getElementById('sum-tfoot-y');
+      const sumTfootXX = document.getElementById('sum-tfoot-xx');
+      const sumTfootYY = document.getElementById('sum-tfoot-yy');
+      const sumTfootXY = document.getElementById('sum-tfoot-xy');
+      const summary = {
+        sumX: document.getElementById('sum-x'),
+        sumY: document.getElementById('sum-y'),
+        sumXX: document.getElementById('sum-xx'),
+        sumYY: document.getElementById('sum-yy'),
+        sumXY: document.getElementById('sum-xy'),
+        countN: document.getElementById('count-n'),
+        ssxx: document.getElementById('ssxx'),
+        ssyy: document.getElementById('ssyy'),
+        ssxy: document.getElementById('ssxy'),
+        coefR: document.getElementById('coef-r'),
+        coefR2: document.getElementById('coef-r2'),
+        regressionEquation: document.getElementById('regression-equation'),
+      };
+      const summaryContainer = document.getElementById('summary-container');
+      const chartContainer = document.getElementById('chart-container');
+      const downloadBtn = document.getElementById('download-chart');
+      const ctx = document.getElementById('scatter-chart').getContext('2d');
+      let chart;
+
+      // Format number with comma decimal separator, no trailing zeros if integer
+      function formatNumber(num) {
+        if (num === null || num === undefined || isNaN(num)) return '-';
+        if (Number.isInteger(num)) return num.toString();
+        let s = num.toFixed(4);
+        s = s.replace(/\.?0+$/, '');
+        return s.replace('.', ',');
+      }
+
+      btn.addEventListener('click', () => {
+        const rawData = textarea.value.trim();
+        if (!rawData) {
+          alert('Silakan masukkan data pasangan nilai x dan y terlebih dahulu.');
+          return;
+        }
+
+        const dataPoints = parseInput(rawData);
+        if (dataPoints.length < 2) {
+          alert('Masukkan minimal 2 pasangan data yang valid.');
+          return;
+        }
+
+        performCalculations(dataPoints);
+
+        const SSxx = dataPoints.reduce((acc, pt) => acc + pt.x * pt.x, 0) -
+          Math.pow(dataPoints.reduce((acc, pt) => acc + pt.x, 0), 2) / dataPoints.length;
+
+        const SSxy = dataPoints.reduce((acc, pt) => acc + pt.x * pt.y, 0) -
+          (dataPoints.reduce((acc, pt) => acc + pt.x, 0) * dataPoints.reduce((acc, pt) => acc + pt.y, 0)) / dataPoints.length;
+
+        const meanX = dataPoints.reduce((acc, pt) => acc + pt.x, 0) / dataPoints.length;
+        const meanY = dataPoints.reduce((acc, pt) => acc + pt.y, 0) / dataPoints.length;
+
+        const b = SSxx === 0 ? 0 : SSxy / SSxx;
+        const a = meanY - b * meanX;
+
+        renderChart(dataPoints, a, b);
+      });
+
+      function parseInput(input) {
+        const lines = input.split('\n').map(line => line.trim()).filter(Boolean);
+        const points = [];
+        for (const line of lines) {
+          let parts = line.split(/[\s]+/);
+          if (parts.length < 2) {
+            parts = line.split(',');
+            if (parts.length < 2) continue;
+          }
+          let xStr = parts[0].replace(',', '.').trim();
+          let yStr = parts[1].replace(',', '.').trim();
+          const x = parseFloat(xStr);
+          const y = parseFloat(yStr);
+          if (isNaN(x) || isNaN(y)) continue;
+          points.push({ x, y });
+        }
+        return points;
+      }
+
+      function performCalculations(points) {
+        tbody.innerHTML = '';
+        let sumX = 0,
+          sumY = 0,
+          sumXX = 0,
+          sumYY = 0,
+          sumXY = 0;
+        const n = points.length;
+
+        points.forEach((pt) => {
+          pt.xx = pt.x * pt.x;
+          pt.yy = pt.y * pt.y;
+          pt.xy = pt.x * pt.y;
+          sumX += pt.x;
+          sumY += pt.y;
+          sumXX += pt.xx;
+          sumYY += pt.yy;
+          sumXY += pt.xy;
+        });
+
+        const SSxx = sumXX - (sumX * sumX) / n;
+        const SSyy = sumYY - (sumY * sumY) / n;
+        const SSxy = sumXY - (sumX * sumY) / n;
+
+        const r = SSxx && SSyy ? SSxy / Math.sqrt(SSxx * SSyy) : NaN;
+        const r2 = r * r * 100; // percentage
+
+        const meanX = sumX / n;
+        const meanY = sumY / n;
+        const b = SSxx === 0 ? 0 : SSxy / SSxx;
+        const a = meanY - b * meanX;
+
+        for (const pt of points) {
+          const row = document.createElement('tr');
+          row.innerHTML =
+            `<td>${formatNumber(pt.x)}</td>` +
+            `<td>${formatNumber(pt.y)}</td>` +
+            `<td>${formatNumber(pt.xx)}</td>` +
+            `<td>${formatNumber(pt.yy)}</td>` +
+            `<td>${formatNumber(pt.xy)}</td>`;
+          tbody.appendChild(row);
+        }
+
+        sumTfootY.textContent = formatNumber(sumY);
+        sumTfootXX.textContent = formatNumber(sumXX);
+        sumTfootYY.textContent = formatNumber(sumYY);
+        sumTfootXY.textContent = formatNumber(sumXY);
+
+        summary.sumX.textContent = formatNumber(sumX);
+        summary.sumY.textContent = formatNumber(sumY);
+        summary.sumXX.textContent = formatNumber(sumXX);
+        summary.sumYY.textContent = formatNumber(sumYY);
+        summary.sumXY.textContent = formatNumber(sumXY);
+        summary.countN.textContent = n;
+        summary.ssxx.textContent = formatNumber(SSxx);
+        summary.ssyy.textContent = formatNumber(SSyy);
+        summary.ssxy.textContent = formatNumber(SSxy);
+        summary.coefR.textContent = isFinite(r) ? formatNumber(r) : 'Tidak terdefinisi';
+        summary.coefR2.textContent = isFinite(r2) ? `${formatNumber(r2)}%` : 'Tidak terdefinisi';
+        summary.regressionEquation.textContent = `y = ${formatNumber(a)} + ${formatNumber(b)}x`;
+
+        tableContainer.hidden = false;
+        summaryContainer.hidden = false;
+        chartContainer.hidden = false;
+      }
+
+      /**
+       * The initial stable charting method:
+       * - Scatter points data.
+       * - Regression line connecting min and max x.
+       * - Natural scale.
+       * - Smooth animation.
+       * - Comma decimal format on axes and tooltip.
+       */
+      function renderChart(points, a, b) {
+        const scatterData = points.map((pt) => ({ x: pt.x, y: pt.y }));
+
+        const xs = points.map((pt) => pt.x);
+        const minX = Math.min(...xs);
+        const maxX = Math.max(...xs);
+
+        const regLineData = [
+          { x: minX, y: a + b * minX },
+          { x: maxX, y: a + b * maxX },
+        ];
+
+        if (chart) {
+          chart.destroy();
+        }
+
+        chart = new Chart(ctx, {
+          type: 'scatter',
+          data: {
+            datasets: [
+              {
+                label: 'Data',
+                data: scatterData,
+                backgroundColor: 'rgba(37, 99, 235, 0.8)',
+                pointRadius: 6,
+                pointHoverRadius: 8,
+                showLine: false,
+              },
+              {
+                label: 'Garis Regresi',
+                data: regLineData,
+                type: 'line',
+                fill: false,
+                borderColor: 'rgba(220, 38, 38, 0.85)',
+                borderWidth: 3,
+                borderDash: [10, 6],
+                pointRadius: 0,
+                tension: 0,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            aspectRatio: 2,
+            animation: {
+              duration: 400,
+              easing: 'easeOutQuart',
+            },
+            plugins: {
+              legend: {
+                labels: {
+                  font: {
+                    family: 'Poppins',
+                    size: 14,
+                    weight: '600',
+                  },
+                },
+              },
+              tooltip: {
+                callbacks: {
+                  label: (ctx) =>
+                    `x: ${formatNumber(ctx.parsed.x)}, y: ${formatNumber(ctx.parsed.y)}`,
+                },
+                backgroundColor: 'rgba(37, 99, 235, 0.85)',
+                titleFont: { family: 'Poppins', size: 14 },
+                bodyFont: { family: 'Poppins', size: 13 },
+              },
+            },
+            scales: {
+              x: {
+                type: 'linear',
+                position: 'bottom',
+                title: {
+                  display: true,
+                  text: 'Nilai x',
+                  font: { weight: 'bold', family: 'Poppins', size: 16 },
+                },
+                ticks: {
+                  callback: (value) =>
+                    Number.isInteger(value) ? value.toString() : value.toString().replace('.', ','),
+                },
+                grid: {
+                  color: '#e5e7eb',
+                },
+                min: 0,
+              },
+              y: {
+                title: {
+                  display: true,
+                  text: 'Nilai y',
+                  font: { weight: 'bold', family: 'Poppins', size: 16 },
+                },
+                ticks: {
+                  callback: (value) =>
+                    Number.isInteger(value) ? value.toString() : value.toString().replace('.', ','),
+                },
+                grid: {
+                  color: '#e5e7eb',
+                },
+                min: 0,
+              },
+            },
+          },
+        });
+      }
+
+      downloadBtn.addEventListener('click', () => {
+        if (!chart) {
+          alert('Silakan hitung terlebih dahulu grafik yang ingin diunduh.');
+          return;
+        }
+        const link = document.createElement('a');
+        link.download = 'grafik-korelasi-regresi.png';
+        link.href = chart.toBase64Image();
+        link.click();
+      });
+    })();
+  </script>
+</body>
+</html>
